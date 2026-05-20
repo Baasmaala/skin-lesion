@@ -1,0 +1,29 @@
+# Virtual environment
+venv/
+
+# Data (too big for git)
+data/
+
+# Model checkpoints (too big for git)
+models/*.pt
+models/*.pth
+models/*.ckpt
+
+# Results that get regenerated
+results/*.png
+results/*.csv
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
