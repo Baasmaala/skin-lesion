@@ -1,22 +1,33 @@
 # Virtual environment
 venv/
+.venv/
 
 # Data (too big for git)
 data/
 
-# Model checkpoints (too big for git)
-models/*.pt
-models/*.pth
-models/*.ckpt
+# Large raw files
+*.zip
+*.tar
+*.tar.gz
 
-# Results that get regenerated
-results/*.png
-results/*.csv
+# Model checkpoints (too big for git) -- block ANYWHERE in tree
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+
+# Training logs (regenerable)
+results/logs/
+results/checkpoints/
+
+# Allow plot images (the whole point of results/plots/ is to be committed)
+# (no rule needed -- they're not blocked)
 
 # Python cache
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 
 # Jupyter
 .ipynb_checkpoints/
@@ -26,4 +37,4 @@ __pycache__/
 
 # OS
 .DS_Store
-Thumbs.db
+Thumbs.db# Confirm the new rules work
