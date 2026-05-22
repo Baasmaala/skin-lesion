@@ -1,0 +1,8 @@
+class_idx,class_name,n_real,n_cvae,fid_cvae,n_cgan,fid_cgan
+0,MEL,0,1000,,1000,
+1,NV,0,1000,,1000,
+2,BCC,0,1000,,1000,
+3,AKIEC,0,1000,,1000,
+4,BKL,0,1000,,1000,
+5,DF,0,1000,,1000,
+6,VASC,0,1000,,1000,
