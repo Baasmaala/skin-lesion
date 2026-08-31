@@ -1,0 +1,118 @@
+.upload {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-alt);
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.upload:hover,
+.upload--active {
+  border-color: var(--color-accent);
+  background: var(--color-secondary);
+}
+
+.upload__icon {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 18px;
+}
+
+.upload__title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--color-primary-dark);
+}
+
+.upload__subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  margin: 10px 0;
+}
+
+.upload__browse-btn {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.upload__browse-btn:hover {
+  background: var(--color-primary-light);
+}
+
+.upload__hint {
+  margin-top: 16px;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.upload__error {
+  margin-top: 12px;
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Preview state */
+.upload--preview {
+  cursor: default;
+  padding: 20px;
+  align-items: stretch;
+}
+
+.upload__preview-img {
+  width: 100%;
+  max-height: 380px;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  background: #0b1120;
+}
+
+.upload__preview-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.upload__filename {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upload__clear {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.upload__clear:hover {
+  text-decoration: underline;
+}
