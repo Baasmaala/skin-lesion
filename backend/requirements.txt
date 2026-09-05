@@ -1,0 +1,5 @@
+# Backend-only dependencies (in addition to the project's root requirements.txt,
+# which already provides torch, torchvision, pillow, numpy, matplotlib).
+fastapi
+uvicorn[standard]
+python-multipart

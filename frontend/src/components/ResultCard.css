@@ -39,6 +39,35 @@
   background: var(--color-danger);
 }
 
+.result-card--uncertain {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.result-card--uncertain .result-card__status-dot {
+  background: #d97706;
+}
+
+.result-card--uncertain .result-card__prediction {
+  color: #92400e;
+}
+
+.result-card__uncertain-text {
+  color: #78350f;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.result-card__uncertain-note {
+  color: #92400e;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
 .result-card__prediction {
   font-size: 1.2rem;
 }
@@ -110,6 +139,19 @@
   color: var(--color-primary-dark);
   min-width: 52px;
   text-align: right;
+}
+
+.result-card__gradcam {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result-card__gradcam-img {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
 }
 
 .result-card__disclaimer {
