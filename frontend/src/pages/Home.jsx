@@ -47,7 +47,7 @@ export default function Home() {
               AI-Powered Skin Lesion Analysis, <span>In Seconds</span>
             </h1>
             <p className="hero__subtitle">
-              DermaScope uses artificial intelligence to analyze photos of skin lesions and
+              RareFlect uses artificial intelligence to analyze photos of skin lesions and
               provide a preliminary assessment — helping you understand what you're looking
               at, faster.
             </p>
@@ -84,7 +84,7 @@ export default function Home() {
           <span className="eyebrow">How It Works</span>
           <h2 className="section-heading">Three simple steps</h2>
           <p className="section-subtext">
-            From photo to result, DermaScope keeps the process quick and transparent.
+            From photo to result, RareFlect keeps the process quick and transparent.
           </p>
 
           <div className="steps">
@@ -102,7 +102,7 @@ export default function Home() {
       {/* ---------------- Benefits ---------------- */}
       <section className="section">
         <div className="container">
-          <span className="eyebrow">Why DermaScope</span>
+          <span className="eyebrow">Why RareFlect</span>
           <h2 className="section-heading">Purpose &amp; benefits</h2>
           <p className="section-subtext">
             Built as an AI research project to explore how deep learning can support early
@@ -139,7 +139,7 @@ export default function Home() {
               ⚠️
             </span>
             <p>
-              <strong>Medical disclaimer:</strong> DermaScope is a research and educational
+              <strong>Medical disclaimer:</strong> RareFlect is a research and educational
               prototype. Its AI-generated results are intended to support analysis and
               awareness — they are <strong>not</strong> a medical diagnosis and should never
               replace consultation with a qualified dermatologist.

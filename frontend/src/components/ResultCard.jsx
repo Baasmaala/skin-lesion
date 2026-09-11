@@ -6,14 +6,27 @@ import "./ResultCard.css";
  *   prediction: "Cancer" | "Non-Cancer" | "Uncertain",
  *   type: string,
  *   confidence: number,
- *   is_uncertain?: boolean,
- *   gradcam_image?: string,
+ *   blocked: boolean,       // true ONLY when confidence < threshold — the
+ *                           // sole gate for hiding the result
+ *   is_uncertain: boolean,  // informational only when blocked=false — a
+ *                           // feature-distance note, never hides anything
+ *   class_probabilities?: { class_code, name, confidence }[],  // absent if blocked
+ *   gradcam_image?: string,                                     // absent if blocked
  * }
+ *
+ * IMPORTANT: gate the blocking UI on `blocked`, NOT `is_uncertain` — they
+ * are deliberately different flags. Reusing is_uncertain as the gate here
+ * previously caused a real bug: a confident, correctly-classified result
+ * with is_uncertain=true (feature-distance note) got its whole result
+ * hidden, even though the backend never intended to block it.
  */
 export default function ResultCard({ result }) {
   if (!result) return null;
 
-  if (result.is_uncertain) {
+  // Below LOW_CONFIDENCE_THRESHOLD: blocked entirely, no classification or
+  // breakdown — see backend/inference.py. This is the ONLY thing that
+  // should hide the result.
+  if (result.blocked) {
     return (
       <div className="result-card result-card--uncertain">
         <div className="result-card__header">
@@ -26,8 +39,7 @@ export default function ResultCard({ result }) {
         <p className="result-card__uncertain-note">
           The model's top confidence was only {result.confidence.toFixed(1)}% — too low to
           give a reliable classification. This usually means the photo isn't a close-up
-          dermoscopic image of a lesion (e.g. it's a regular photo of skin, or an unrelated
-          image). Try uploading a clearer, closer photo of the specific lesion.
+          dermoscopic image of a lesion. Try uploading a clearer, closer photo.
         </p>
 
         <p className="result-card__disclaimer">
@@ -48,6 +60,13 @@ export default function ResultCard({ result }) {
           {isCancer ? "Potentially Cancerous" : "Likely Non-Cancerous"}
         </h3>
       </div>
+
+      {result.is_uncertain && (
+        <p className="result-card__uncertain-note">
+          ⚠️ This image's internal features sit somewhat outside the model's usual
+          range — treat this specific result with a bit of extra caution.
+        </p>
+      )}
 
       <div className="result-card__grid">
         <div className="result-card__field">
@@ -75,6 +94,28 @@ export default function ResultCard({ result }) {
           </div>
         </div>
       </div>
+
+      {result.class_probabilities && result.class_probabilities.length > 0 && (
+        <div className="result-card__breakdown">
+          <span className="result-card__label">Full Breakdown — All Classes</span>
+          <div className="result-card__breakdown-list">
+            {result.class_probabilities.map((row) => (
+              <div className="result-card__breakdown-row" key={row.class_code}>
+                <span className="result-card__breakdown-name">{row.name}</span>
+                <div className="result-card__breakdown-bar-track">
+                  <div
+                    className="result-card__breakdown-bar-fill"
+                    style={{ width: `${row.confidence}%` }}
+                  />
+                </div>
+                <span className="result-card__breakdown-value">
+                  {row.confidence.toFixed(1)}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {result.gradcam_image && (
         <div className="result-card__gradcam">

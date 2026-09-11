@@ -48,13 +48,13 @@ IMG_SIZE = 224
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
 
-# Below this softmax confidence, we treat the top prediction as unreliable.
-# On its own this is a weak signal — a classifier can still be confidently
-# wrong on images unlike anything it was trained on — so it's combined below
-# with a feature-space distance check, which looks at whether the image even
-# *resembles* real skin-lesion photos internally, independent of what label
-# the final layer picked.
-LOW_CONFIDENCE_THRESHOLD = 50.0
+# Below this softmax confidence, the response is blocked entirely (no
+# classification, no breakdown) — the image is treated as unreliable rather
+# than shown with a misleadingly specific-looking result. Deliberately low
+# (30%, not far above the 7-class random baseline of ~14%): above this, we'd
+# rather show the real numbers (including the full per-class breakdown) and
+# let the user judge, than hide a borderline-but-plausible result.
+LOW_CONFIDENCE_THRESHOLD = 30.0
 
 # Loaded once at startup, if scripts/compute_reference_embeddings.py has been
 # run. `None` until then — the feature-distance check is skipped gracefully
@@ -150,20 +150,55 @@ def predict(image: Image.Image) -> dict:
     """
     Run the classification pipeline on one PIL image.
 
+    Hybrid behaviour:
+      - confidence < LOW_CONFIDENCE_THRESHOLD -> blocked ("blocked": True):
+        returns "Uncertain" with no classification and no breakdown.
+        Confidence is the ONLY thing that blocks the result — it's the one
+        knob meant to be tuned.
+      - otherwise -> not blocked ("blocked": False): full result — top
+        classification PLUS the complete per-class probability breakdown.
+        `is_uncertain` may still be True here (feature-distance check —
+        see below), but it's informational only and does not hide
+        anything; the frontend shows it as a small note alongside the
+        full result.
+
+    IMPORTANT: "blocked" and "is_uncertain" are deliberately separate
+    fields, NOT the same flag reused. A previous version conflated them
+    (reused is_uncertain for both "should the UI hide the result" and
+    "is the feature-distance note applicable"), which caused a real bug:
+    a confident, correctly-classified image with far_from_training_data
+    would get its whole result hidden by the frontend even though it was
+    never meant to be blocked. Keep them separate — the frontend gates
+    the blocking UI on "blocked" only, and shows the note based on
+    "is_uncertain" only.
+
+    Note on feature-distance: it's calibrated as the 95th percentile of
+    validation-set (real, in-distribution) distances, so ~5% of genuinely
+    real images are *expected* to exceed it by construction. That's too
+    noisy a signal to block a result on its own — it's surfaced as a note,
+    not a gate.
+
     Returns
     -------
     dict with keys:
-        prediction   : "Cancer" | "Non-Cancer" | "Uncertain"
-        type         : full display name of the predicted class, or an
-                       explanatory message if is_uncertain is True
-        confidence   : 0-100 float, softmax probability of the top class
-        is_uncertain : True if the image was flagged as unreliable — either
-                       low softmax confidence, or (more robustly) its
-                       internal features sit far from every real
-                       skin-lesion class cluster. See module docstring.
-        class_code   : raw ISIC class code (e.g. "MEL"), or None if uncertain
-                       — used internally by the Grad-CAM step, not shown to
-                       the user directly
+        prediction           : "Cancer" | "Non-Cancer" | "Uncertain"
+        type                 : full display name of the top class, or an
+                               explanatory message if blocked (confidence
+                               < LOW_CONFIDENCE_THRESHOLD)
+        confidence           : 0-100 float, softmax probability of the top class
+        blocked              : True if confidence < LOW_CONFIDENCE_THRESHOLD
+                               — the ONLY thing the frontend should use to
+                               decide whether to hide the result
+        is_uncertain         : informational only, meaningless when
+                               blocked=True. When blocked=False, True means
+                               this specific result's features sit outside
+                               the model's usual range — worth an extra-
+                               caution note, but never hides anything.
+        class_code           : raw ISIC class code of the top class, or None
+                               if blocked
+        class_probabilities  : list of all 7 classes, each
+                               {class_code, name, confidence}, sorted by
+                               confidence descending — omitted if blocked
     """
     model = get_model()
     x = preprocess(image)
@@ -175,30 +210,49 @@ def predict(image: Image.Image) -> dict:
     info = CLASS_INFO[class_code]
     confidence = round(float(probs[top_idx]) * 100, 1)
 
-    low_confidence = confidence < LOW_CONFIDENCE_THRESHOLD
-
-    far_from_training_data = False
-    nearest_distance = None
-    if _class_centroids is not None and _last_features is not None:
-        feat = _last_features[0].cpu().numpy()
-        dists = np.linalg.norm(_class_centroids - feat[None, :], axis=1)
-        nearest_distance = float(dists.min())
-        far_from_training_data = nearest_distance > _distance_threshold
-
-    if low_confidence or far_from_training_data:
+    # Only confidence blocks the result outright — this is the one knob
+    # meant to be tuned (LOW_CONFIDENCE_THRESHOLD above).
+    if confidence < LOW_CONFIDENCE_THRESHOLD:
         return {
             "prediction": "Uncertain",
             "type": "Image doesn't clearly show a skin lesion — please upload "
             "a closer, well-lit photo of the lesion itself.",
             "confidence": confidence,
+            "blocked": True,
             "is_uncertain": True,
             "class_code": None,
         }
+
+    # Feature-distance is informational only from here on — it does NOT
+    # block the result. Note: because it was calibrated as the 95th
+    # percentile of validation-set distances, ~5% of genuinely real,
+    # in-distribution images are *expected* to exceed it by construction —
+    # so on its own it's too noisy a signal to hide a result behind.
+    far_from_training_data = False
+    if _class_centroids is not None and _last_features is not None:
+        feat = _last_features[0].cpu().numpy()
+        dists = np.linalg.norm(_class_centroids - feat[None, :], axis=1)
+        far_from_training_data = float(dists.min()) > _distance_threshold
+
+    class_probabilities = sorted(
+        (
+            {
+                "class_code": code,
+                "name": CLASS_INFO[code]["name"],
+                "confidence": round(float(probs[i]) * 100, 1),
+            }
+            for i, code in enumerate(CLASS_NAMES)
+        ),
+        key=lambda row: row["confidence"],
+        reverse=True,
+    )
 
     return {
         "prediction": "Cancer" if info["malignant"] else "Non-Cancer",
         "type": info["name"],
         "confidence": confidence,
-        "is_uncertain": False,
+        "blocked": False,
+        "is_uncertain": far_from_training_data,
         "class_code": class_code,
+        "class_probabilities": class_probabilities,
     }

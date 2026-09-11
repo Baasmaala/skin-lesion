@@ -53,16 +53,20 @@ async def predict_endpoint(file: UploadFile = File(...)):
     Accepts one image file, returns:
         {
           "prediction": "Cancer" | "Non-Cancer" | "Uncertain",
-          "type": "<full class name>" | explanatory message if uncertain,
+          "type": "<full class name>" | explanatory message if blocked,
           "confidence": <0-100 float>,
-          "is_uncertain": bool,
-          "gradcam_image": "data:image/png;base64,..." (omitted if uncertain)
+          "blocked": bool,       # the ONLY flag that means "no classification"
+          "is_uncertain": bool,  # informational note only when blocked=False
+          "class_probabilities": [{class_code, name, confidence}, ...] (all 7,
+                                  sorted descending — omitted if blocked),
+          "gradcam_image": "data:image/png;base64,..." (omitted if blocked)
         }
 
-    Note on "Uncertain": below a confidence threshold, we skip forcing a
-    classification — this is a heuristic mitigation for out-of-scope images
-    (e.g. a photo that isn't a dermoscopic lesion at all), not a guaranteed
-    out-of-distribution detector. See backend/inference.py for details.
+    Below a confidence threshold, the result is blocked entirely
+    ("Uncertain") rather than shown with a misleadingly specific number.
+    Above it, the full classification + per-class breakdown + Grad-CAM are
+    all returned — regardless of is_uncertain, which is informational only.
+    See backend/inference.py for the exact thresholds and reasoning.
     """
     if not file.content_type or not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="Please upload an image file.")
@@ -75,10 +79,11 @@ async def predict_endpoint(file: UploadFile = File(...)):
 
     result = predict(image)
 
-    if not result["is_uncertain"]:
+    if not result["blocked"]:
         # Grad-CAM for the predicted class, on the same preprocessed input.
-        # Skipped when uncertain — a heatmap would falsely imply the model
-        # confidently identified a lesion region.
+        # Skipped only when blocked — no class was picked, and a heatmap
+        # would falsely imply the model confidently identified a lesion
+        # region. is_uncertain alone must NOT skip this — that was the bug.
         model = get_model()
         x = preprocess(image)
         class_idx = CLASS_NAMES.index(result["class_code"])

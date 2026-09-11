@@ -6,7 +6,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="container footer__inner">
         <div className="footer__brand">
-          <span className="footer__name">DermaScope</span>
+          <span className="footer__name">RareFlect</span>
           <p className="footer__tagline">
             AI-assisted skin lesion analysis — a research prototype built as part of an
             academic AI/Deep Learning graduation project.
@@ -19,12 +19,12 @@ export default function Footer() {
         </nav>
 
         <p className="footer__disclaimer">
-          DermaScope is a research and educational tool. Its predictions are intended to
+          RareFlect is a research and educational tool. Its predictions are intended to
           support — not replace — evaluation by a qualified medical professional. Always
           consult a dermatologist for diagnosis and treatment decisions.
         </p>
 
-        <p className="footer__copy">© {new Date().getFullYear()} DermaScope. Academic project.</p>
+        <p className="footer__copy">© {new Date().getFullYear()} RareFlect. Academic project.</p>
       </div>
     </footer>
   );

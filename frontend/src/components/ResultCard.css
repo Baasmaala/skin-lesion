@@ -141,6 +141,56 @@
   text-align: right;
 }
 
+.result-card__breakdown {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.result-card__breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result-card__breakdown-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.result-card__breakdown-name {
+  font-size: 0.82rem;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.result-card__breakdown-bar-track {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.result-card__breakdown-bar-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.result-card__breakdown-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  min-width: 42px;
+  text-align: right;
+}
+
 .result-card__gradcam {
   margin-top: 20px;
   display: flex;
