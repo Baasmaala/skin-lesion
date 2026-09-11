@@ -20,7 +20,7 @@ export default function Navbar() {
               <circle cx="16" cy="18" r="2.4" fill="#14b8a6" />
             </svg>
           </span>
-          <span className="navbar__name">DermaScope</span>
+          <span className="navbar__name">RareFlect</span>
         </NavLink>
 
         <button
