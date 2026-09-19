@@ -1,0 +1,9 @@
+.git
+data/
+notebooks/
+sample_clinical_images/
+frontend/
+results/logs/
+results/plots/
+**/__pycache__/
+*.pyc

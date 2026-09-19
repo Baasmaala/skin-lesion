@@ -1,0 +1,10 @@
+# Production dependencies for the deployed backend container.
+# torch/torchvision are installed separately in the Dockerfile from the
+# CPU-only wheel index (https://download.pytorch.org/whl/cpu) so the image
+# doesn't ship the ~2GB of bundled CUDA libraries it doesn't need.
+fastapi
+uvicorn[standard]
+python-multipart
+numpy
+Pillow
+matplotlib
