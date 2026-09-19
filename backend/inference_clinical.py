@@ -80,7 +80,7 @@ def load_model():
             f"and scripts/make_clinical_splits.py for the data prep steps)."
         )
 
-    model = build_resnet50_classifier(num_classes=len(CLASS_NAMES), freeze_backbone=False)
+    model = build_resnet50_classifier(num_classes=len(CLASS_NAMES), freeze_backbone=False, pretrained=False)
     ckpt = torch.load(CHECKPOINT_PATH, map_location=_device, weights_only=False)
     model.load_state_dict(ckpt["model_state_dict"])
     model.to(_device)

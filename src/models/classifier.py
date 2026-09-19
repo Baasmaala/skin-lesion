@@ -12,7 +12,7 @@ import torch.nn as nn
 from torchvision import models
 
 
-def build_resnet50_classifier(num_classes: int = 7, freeze_backbone: bool = True) -> nn.Module:
+def build_resnet50_classifier(num_classes: int = 7, freeze_backbone: bool = True, pretrained: bool = True) -> nn.Module:
     """
     Build a ResNet50 pretrained on ImageNet with a new classification head.
 
@@ -23,6 +23,12 @@ def build_resnet50_classifier(num_classes: int = 7, freeze_backbone: bool = True
     freeze_backbone : bool
         If True, freeze all layers except the final FC head.
         If False, all parameters are trainable (full fine-tuning).
+    pretrained : bool
+        If True (default, used for training), initializes from ImageNet
+        weights downloaded from pytorch.org. If False, skips that download
+        and starts from random init — use this at inference time, where a
+        fine-tuned checkpoint gets loaded over the weights immediately
+        after anyway, making the ImageNet download pure wasted time/memory.
 
     Returns
     -------
@@ -34,8 +40,7 @@ def build_resnet50_classifier(num_classes: int = 7, freeze_backbone: bool = True
     The output is raw logits — DO NOT apply softmax. Use `nn.CrossEntropyLoss`,
     which expects logits and applies log-softmax internally.
     """
-    # Load ResNet50 with the latest ImageNet weights
-    weights = models.ResNet50_Weights.IMAGENET1K_V2
+    weights = models.ResNet50_Weights.IMAGENET1K_V2 if pretrained else None
     model = models.resnet50(weights=weights)
 
     # Optionally freeze the entire backbone — only the new head will train
@@ -52,7 +57,7 @@ def build_resnet50_classifier(num_classes: int = 7, freeze_backbone: bool = True
     return model
 
 
-def build_efficientnet_classifier(num_classes: int = 7, freeze_backbone: bool = True) -> nn.Module:
+def build_efficientnet_classifier(num_classes: int = 7, freeze_backbone: bool = True, pretrained: bool = True) -> nn.Module:
     """
     Build an EfficientNet-B3 pretrained on ImageNet with a new classification
     head — used as an architecturally different ensemble member alongside the
@@ -64,7 +69,7 @@ def build_efficientnet_classifier(num_classes: int = 7, freeze_backbone: bool = 
     Same parameters/notes as build_resnet50_classifier — raw logits out, use
     nn.CrossEntropyLoss.
     """
-    weights = models.EfficientNet_B3_Weights.IMAGENET1K_V1
+    weights = models.EfficientNet_B3_Weights.IMAGENET1K_V1 if pretrained else None
     model = models.efficientnet_b3(weights=weights)
 
     if freeze_backbone:

@@ -148,7 +148,7 @@ def load_model():
             f"Run scripts/train_baseline_unfrozen.py first."
         )
 
-    model = build_resnet50_classifier(num_classes=7, freeze_backbone=False)
+    model = build_resnet50_classifier(num_classes=7, freeze_backbone=False, pretrained=False)
     ckpt = torch.load(CHECKPOINT_PATH, map_location=_device, weights_only=False)
     model.load_state_dict(ckpt["model_state_dict"])
     model.to(_device)
@@ -188,7 +188,7 @@ def load_ensemble():
         if not path.exists():
             print(f"[inference] Ensemble checkpoint missing: {path} — ensemble disabled, using single model only.")
             return []
-        fold_model = build_resnet50_classifier(num_classes=7, freeze_backbone=False)
+        fold_model = build_resnet50_classifier(num_classes=7, freeze_backbone=False, pretrained=False)
         ckpt = torch.load(path, map_location=_device, weights_only=False)
         fold_model.load_state_dict(ckpt["model_state_dict"])
         fold_model.to(_device)
@@ -220,7 +220,7 @@ def load_efficientnet():
         )
         return None
 
-    model = build_efficientnet_classifier(num_classes=7, freeze_backbone=False)
+    model = build_efficientnet_classifier(num_classes=7, freeze_backbone=False, pretrained=False)
     ckpt = torch.load(EFFICIENTNET_CHECKPOINT_PATH, map_location=_device, weights_only=False)
     model.load_state_dict(ckpt["model_state_dict"])
     model.to(_device)
