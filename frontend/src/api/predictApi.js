@@ -1,6 +1,6 @@
 /**
  * predictApi — single integration point between the frontend and the
- * DermaScope FastAPI backend (backend/main.py).
+ * Rareflect FastAPI backend (backend/main.py).
  *
  * Backend is live as of the retrained baseline_unfrozen checkpoint — this
  * now calls the real /predict endpoint instead of returning mock data.
@@ -12,16 +12,11 @@
 // running on localhost:8000, e.g. VITE_API_BASE_URL=http://<gpu-server-ip>:8000
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
-/**
- * Analyze one skin lesion image via the real backend.
- * @param {File} file - the uploaded image
- * @returns {Promise<{prediction: string, type: string, confidence: number, gradcam_image?: string}>}
- */
-export async function predictImage(file) {
+async function postImage(path, file) {
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await fetch(`${API_BASE_URL}/predict`, {
+  const res = await fetch(`${API_BASE_URL}${path}`, {
     method: "POST",
     body: formData,
   });
@@ -32,4 +27,25 @@ export async function predictImage(file) {
   }
 
   return res.json();
+}
+
+/**
+ * Analyze one skin lesion image with the dermoscopic model (backend/inference.py).
+ * Used by the clinic path, since a dermatoscope image is what this model expects.
+ * @param {File} file - the uploaded image
+ * @returns {Promise<{prediction: string, type: string, confidence: number, gradcam_image?: string}>}
+ */
+export async function predictImage(file) {
+  return postImage("/predict", file);
+}
+
+/**
+ * Analyze one skin lesion image with the clinical-photo model
+ * (backend/inference_clinical.py), trained on ordinary camera/phone photos
+ * rather than dermoscopic images. Used by the phone path.
+ * @param {File} file - the uploaded image
+ * @returns {Promise<{prediction: string, type: string, confidence: number}>}
+ */
+export async function predictClinicalImage(file) {
+  return postImage("/predict/clinical", file);
 }

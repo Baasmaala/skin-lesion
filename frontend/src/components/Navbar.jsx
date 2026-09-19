@@ -1,26 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./Navbar.css";
 
+const THEME_KEY = "rareflect-theme";
+
+function getInitialTheme() {
+  try {
+    return localStorage.getItem(THEME_KEY) || "system";
+  } catch {
+    return "system";
+  }
+}
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [theme, setTheme] = useState(getInitialTheme);
+
+  useEffect(() => {
+    if (theme === "system") {
+      document.documentElement.removeAttribute("data-theme");
+    } else {
+      document.documentElement.setAttribute("data-theme", theme);
+    }
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch {
+      // localStorage unavailable, theme just won't persist across visits
+    }
+  }, [theme]);
 
   return (
     <header className="navbar">
       <div className="container navbar__inner">
         <NavLink to="/" className="navbar__brand" onClick={() => setOpen(false)}>
           <span className="navbar__logo" aria-hidden="true">
-            <svg viewBox="0 0 32 32" width="30" height="30">
-              <circle cx="16" cy="16" r="16" fill="#1b4b91" />
-              <path
-                d="M16 7c-4.5 3-7 6.7-7 10.4C9 21.6 12.2 25 16 25s7-3.4 7-7.6C23 13.7 20.5 10 16 7z"
-                fill="#fff"
-                opacity="0.95"
-              />
-              <circle cx="16" cy="18" r="2.4" fill="#14b8a6" />
-            </svg>
+            <span className="navbar__logo-r navbar__logo-r--ghost">R</span>
+            <span className="navbar__logo-r">R</span>
+            <span className="navbar__logo-dot" />
           </span>
-          <span className="navbar__name">RareFlect</span>
+          <span className="navbar__name">
+            Rarefle<span className="navbar__name-mirror">c</span>t
+          </span>
         </NavLink>
 
         <button
@@ -40,8 +60,28 @@ export default function Navbar() {
           <NavLink to="/analyze" className="navbar__link" onClick={() => setOpen(false)}>
             Analyze
           </NavLink>
+          <NavLink to="/clinics" className="navbar__link" onClick={() => setOpen(false)}>
+            Clinics
+          </NavLink>
+          <NavLink to="/learn" className="navbar__link" onClick={() => setOpen(false)}>
+            Learn
+          </NavLink>
+
+          <div className="navbar__theme" role="group" aria-label="Theme">
+            {["light", "dark", "system"].map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                className={`navbar__theme-btn ${theme === mode ? "navbar__theme-btn--active" : ""}`}
+                onClick={() => setTheme(mode)}
+              >
+                {mode}
+              </button>
+            ))}
+          </div>
+
           <NavLink to="/analyze" className="navbar__cta" onClick={() => setOpen(false)}>
-            Start Analysis
+            Analyze a photo
           </NavLink>
         </nav>
       </div>

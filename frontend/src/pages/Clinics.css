@@ -1,0 +1,36 @@
+.clinics__header {
+  max-width: 640px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+
+.clinics__title {
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  margin-bottom: 16px;
+}
+
+.clinics__subtitle {
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  margin-bottom: 28px;
+}
+
+.clinics__notice {
+  border: 1px solid var(--border);
+  background: var(--teal-soft);
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+  text-align: left;
+}
+
+.clinics__notice h2 {
+  font-size: 1.05rem;
+  color: var(--teal-text);
+  margin-bottom: 10px;
+}
+
+.clinics__notice p {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}

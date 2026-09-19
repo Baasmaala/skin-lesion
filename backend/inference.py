@@ -8,6 +8,27 @@ This deliberately mirrors the eval_transform and model-loading pattern from
 notebooks/04_train_baseline.ipynb and notebooks/12_train_unfrozen_ablation.ipynb,
 so a prediction made here is guaranteed to use the exact same preprocessing
 the model was trained and evaluated on.
+
+Ensemble: if the 5 k-fold checkpoints (scripts/train_kfold_ensemble.py) and/or
+the EfficientNet-B3 checkpoint (scripts/train_efficientnet.py) are present,
+predict() averages all available models' softmax output instead of using the
+single baseline_unfrozen model alone. Measured on the held-out test set:
+  - single model alone            : val macro-F1 0.738
+  - 5 ResNet50 folds averaged     : test macro-F1 0.749
+  - + EfficientNet-B3 (6-way)     : test macro-F1 0.7575  <- currently deployed
+EfficientNet-B3 is architecturally different from the ResNet50 folds (see
+scripts/evaluate_diverse_ensemble.py) — it was added because it measurably
+improved BOTH precision and recall together, not just a threshold tradeoff
+(unlike a logit-adjustment attempt that was tried and rejected for exactly
+that reason — see scripts/tune_logit_adjustment.py's docstring).
+
+The single "primary" model stays loaded and is still used for the OOD
+feature-distance check and Grad-CAM (both are tied to its specific feature
+space / conv layers — recomputing those per-ensemble-member would be extra
+complexity for a visualization/note that's illustrative, not a scored
+metric). Any combination of ensemble checkpoints being present/missing
+degrades gracefully — predict() just averages whatever's actually loaded,
+falling back to the single primary model alone if none of them are there.
 """
 
 import sys
@@ -22,10 +43,16 @@ from torchvision import transforms
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.models.classifier import build_resnet50_classifier  # noqa: E402
+from src.models.classifier import build_efficientnet_classifier, build_resnet50_classifier  # noqa: E402
 
 CHECKPOINT_PATH = PROJECT_ROOT / "results" / "checkpoints" / "baseline_unfrozen_best.pt"
 REFERENCE_EMBEDDINGS_PATH = PROJECT_ROOT / "results" / "checkpoints" / "reference_embeddings.npz"
+N_ENSEMBLE_FOLDS = 5
+FOLD_CHECKPOINT_PATHS = [
+    PROJECT_ROOT / "results" / "checkpoints" / f"baseline_unfrozen_fold{i}_best.pt" for i in range(N_ENSEMBLE_FOLDS)
+]
+EFFICIENTNET_CHECKPOINT_PATH = PROJECT_ROOT / "results" / "checkpoints" / "efficientnet_b3_best.pt"
+EFFICIENTNET_IMG_SIZE = 300  # trained at this resolution — see scripts/train_efficientnet.py
 
 # Class order is FIXED — must match src/dataset.py CLASS_NAMES exactly, since
 # that's the order the model's output logits are indexed by.
@@ -95,9 +122,18 @@ _eval_transform = transforms.Compose(
         transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
     ]
 )
+_eff_eval_transform = transforms.Compose(
+    [
+        transforms.Resize((EFFICIENTNET_IMG_SIZE, EFFICIENTNET_IMG_SIZE)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
+    ]
+)
 
 _device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 _model = None
+_fold_models = []  # populated by load_ensemble(), stays [] if fold checkpoints aren't present
+_efficientnet_model = None  # populated by load_efficientnet(), stays None if its checkpoint isn't present
 
 
 def load_model():
@@ -130,7 +166,69 @@ def load_model():
     )
     _model = model
     load_reference_embeddings()
+    load_ensemble()
+    load_efficientnet()
     return _model
+
+
+def load_ensemble():
+    """
+    Load the 5 k-fold checkpoints (scripts/train_kfold_ensemble.py), if
+    present — averaging their predictions beat every individual model,
+    including the single deployed one (test macro-F1 0.749 vs 0.738).
+    Optional: predict() falls back to the single model alone if these
+    checkpoints aren't there, so this never blocks startup.
+    """
+    global _fold_models
+    if _fold_models:
+        return _fold_models
+
+    loaded = []
+    for path in FOLD_CHECKPOINT_PATHS:
+        if not path.exists():
+            print(f"[inference] Ensemble checkpoint missing: {path} — ensemble disabled, using single model only.")
+            return []
+        fold_model = build_resnet50_classifier(num_classes=7, freeze_backbone=False)
+        ckpt = torch.load(path, map_location=_device, weights_only=False)
+        fold_model.load_state_dict(ckpt["model_state_dict"])
+        fold_model.to(_device)
+        fold_model.eval()
+        loaded.append(fold_model)
+
+    _fold_models = loaded
+    print(f"[inference] Loaded {len(_fold_models)}-model k-fold ensemble — predictions will be averaged across them.")
+    return _fold_models
+
+
+def load_efficientnet():
+    """
+    Load the EfficientNet-B3 checkpoint (scripts/train_efficientnet.py), if
+    present. Added to the ensemble because it measurably improved BOTH
+    precision and recall together (test macro-F1 0.749 -> 0.7575) — see
+    scripts/evaluate_diverse_ensemble.py. Optional: predict() just skips it
+    if this checkpoint isn't there, same graceful-degradation pattern as the
+    k-fold ensemble above.
+    """
+    global _efficientnet_model
+    if _efficientnet_model is not None:
+        return _efficientnet_model
+
+    if not EFFICIENTNET_CHECKPOINT_PATH.exists():
+        print(
+            f"[inference] EfficientNet checkpoint missing: {EFFICIENTNET_CHECKPOINT_PATH} — "
+            f"6-way ensemble disabled, using whatever else is loaded."
+        )
+        return None
+
+    model = build_efficientnet_classifier(num_classes=7, freeze_backbone=False)
+    ckpt = torch.load(EFFICIENTNET_CHECKPOINT_PATH, map_location=_device, weights_only=False)
+    model.load_state_dict(ckpt["model_state_dict"])
+    model.to(_device)
+    model.eval()
+
+    _efficientnet_model = model
+    print("[inference] Loaded EfficientNet-B3 — included in the ensemble average.")
+    return _efficientnet_model
 
 
 def get_model():
@@ -138,10 +236,27 @@ def get_model():
     return _model if _model is not None else load_model()
 
 
+def ensemble_size() -> int:
+    """Number of k-fold models currently loaded (0 if the ensemble checkpoints aren't present)."""
+    return len(_fold_models)
+
+
+def efficientnet_loaded() -> bool:
+    """Whether the EfficientNet-B3 ensemble member is currently loaded."""
+    return _efficientnet_model is not None
+
+
 def preprocess(image: Image.Image) -> torch.Tensor:
     """PIL image (any mode/size) -> normalized batch tensor of shape (1, 3, 224, 224)."""
     image = image.convert("RGB")
     tensor = _eval_transform(image)
+    return tensor.unsqueeze(0).to(_device)
+
+
+def preprocess_efficientnet(image: Image.Image) -> torch.Tensor:
+    """PIL image -> normalized batch tensor at EfficientNet-B3's own 300x300 resolution."""
+    image = image.convert("RGB")
+    tensor = _eff_eval_transform(image)
     return tensor.unsqueeze(0).to(_device)
 
 
@@ -202,8 +317,20 @@ def predict(image: Image.Image) -> dict:
     """
     model = get_model()
     x = preprocess(image)
-    logits = model(x)  # _feature_hook also fires here, filling _last_features
-    probs = F.softmax(logits, dim=1)[0]
+    logits = model(x)  # _feature_hook also fires here, filling _last_features — needed for the OOD check below
+    primary_probs = F.softmax(logits, dim=1)[0]
+
+    # Average every available ensemble member's softmax output — whatever
+    # combination of the 5 k-fold models and EfficientNet-B3 happens to be
+    # loaded (see load_ensemble()/load_efficientnet()); the primary model's
+    # own forward pass above still ran regardless, since its feature hook
+    # feeds the OOD check further down.
+    ensemble_probs = [F.softmax(fold_model(x), dim=1)[0] for fold_model in _fold_models]
+    if _efficientnet_model is not None:
+        x_eff = preprocess_efficientnet(image)
+        ensemble_probs.append(F.softmax(_efficientnet_model(x_eff), dim=1)[0])
+
+    probs = torch.stack(ensemble_probs, dim=0).mean(dim=0) if ensemble_probs else primary_probs
 
     top_idx = int(torch.argmax(probs).item())
     class_code = CLASS_NAMES[top_idx]

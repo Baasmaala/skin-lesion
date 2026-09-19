@@ -5,33 +5,33 @@ import "./Home.css";
 const STEPS = [
   {
     number: "01",
-    title: "Upload an image",
-    text: "Upload a clear photo of a skin lesion — from a dermoscopic device or a regular camera.",
+    title: "Take or upload a photo",
+    text: "Take a clear photo of a lesion yourself, or have one captured at a partner clinic.",
   },
   {
     number: "02",
-    title: "AI model analyzes it",
-    text: "A fine-tuned deep learning model (ResNet50) processes the image and evaluates lesion patterns.",
+    title: "The model analyzes it",
+    text: "A model trained on dermatologist graded images evaluates the lesion's features.",
   },
   {
     number: "03",
-    title: "Get your result",
-    text: "See the prediction, the likely category, and a confidence score in a clear, easy-to-read report.",
+    title: "Get a clear result",
+    text: "See whether it looks common, uncertain, or flagged as rare, plus a clear next step.",
   },
 ];
 
 const BENEFITS = [
   {
-    title: "Fast, preliminary insight",
-    text: "Get an AI-generated read on a skin lesion in seconds, to help you decide on next steps.",
+    title: "Fast, private screening",
+    text: "Get a read on a lesion in under a minute, with no appointment needed to start.",
   },
   {
     title: "Built on real research",
-    text: "Trained on the ISIC 2018 dermoscopy dataset, with class-imbalance-aware evaluation.",
+    text: "Trained on dermatologist graded dermoscopy images, evaluated with attention to rare classes.",
   },
   {
-    title: "Explainable by design",
-    text: "Designed to support clear, transparent AI-assisted screening — not a black box.",
+    title: "A clear next step, always",
+    text: "Every result names what to do next, whether that is nothing, a follow up, or a dermatologist visit.",
   },
 ];
 
@@ -40,51 +40,94 @@ export default function Home() {
     <>
       {/* ---------------- Hero ---------------- */}
       <section className="hero">
-        <div className="container hero__inner">
-          <div className="hero__copy">
-            <span className="eyebrow">AI-Powered Dermatology</span>
-            <h1 className="hero__title">
-              AI-Powered Skin Lesion Analysis, <span>In Seconds</span>
-            </h1>
-            <p className="hero__subtitle">
-              RareFlect uses artificial intelligence to analyze photos of skin lesions and
-              provide a preliminary assessment — helping you understand what you're looking
-              at, faster.
-            </p>
-            <div className="hero__actions">
-              <Button as={Link} to="/analyze" variant="primary" size="md">
-                Analyze Your Skin
-              </Button>
-              <Button as={Link} to="/analyze" variant="outline" size="md">
-                Upload Image
+        <div className="container">
+          <h1 className="hero__title">Check a lesion your way.</h1>
+          <p className="hero__subtitle">
+            Rareflect screens skin lesions with a model trained on images
+            graded by dermatologists. Start from your phone in seconds, or
+            visit a partner clinic for a more detailed scan and a direct path
+            to a dermatologist if something needs a closer look.
+          </p>
+        </div>
+      </section>
+
+      {/* ---------------- Two paths ---------------- */}
+      <section className="paths-section">
+        <div className="container">
+          <div className="paths">
+            <div className="path-card path-card--primary">
+              <svg className="path-card__icon" viewBox="0 0 40 40" fill="none" stroke="var(--teal-text)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="11" y="4" width="18" height="32" rx="3" />
+                <circle cx="20" cy="30" r="1.6" fill="var(--teal-text)" stroke="none" />
+                <path d="M15 9h10" strokeWidth="1.6" />
+              </svg>
+              <h3>Use your phone</h3>
+              <p>
+                Take a photo at home and get a screening result in under a
+                minute. It is private, free to start, and needs no
+                appointment.
+              </p>
+              <Button as={Link} to="/analyze" variant="primary" size="md" className="path-card__cta">
+                Analyze a photo
               </Button>
             </div>
-            <p className="hero__note">
-              🔒 Images are processed for analysis only and are not stored or shared.
-            </p>
+
+            <div className="path-card">
+              <svg className="path-card__icon" viewBox="0 0 40 40" fill="none" stroke="var(--ink)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="6" y="14" width="28" height="21" rx="2" />
+                <path d="M14 35v-9h12v9" />
+                <path d="M20 14v-6M17 11h6" strokeWidth="2" />
+                <path d="M6 22h28" strokeWidth="1.4" opacity="0.5" />
+              </svg>
+              <h3>Visit a clinic</h3>
+              <p>
+                Partner clinics capture a dermatoscope scan, read by a model
+                trained specifically on that kind of image, then connect you
+                straight to a dermatologist if a result is flagged.
+              </p>
+              <Button as={Link} to="/clinics" variant="outline" size="md" className="path-card__cta">
+                Find a clinic
+              </Button>
+            </div>
           </div>
 
-          <div className="hero__visual" aria-hidden="true">
-            <div className="hero__visual-card">
-              <div className="hero__visual-scan" />
-              <svg viewBox="0 0 200 200" width="100%" height="100%">
-                <circle cx="100" cy="100" r="92" fill="#eaf2fb" />
-                <circle cx="100" cy="100" r="60" fill="#ffffff" stroke="#1b4b91" strokeWidth="2" />
-                <circle cx="100" cy="100" r="34" fill="#1b4b91" opacity="0.85" />
-                <circle cx="100" cy="100" r="12" fill="#14b8a6" />
-              </svg>
+          <p className="paths__fine-print">
+            Rareflect is a screening aid, not a diagnosis. Results flagged as
+            rare should always be reviewed by a dermatologist. The clinic
+            path connects you to one directly.
+          </p>
+        </div>
+      </section>
+
+      {/* ---------------- Fun fact ---------------- */}
+      <section className="section-alt fun-fact-section">
+        <div className="container">
+          <div className="fun-fact">
+            <svg viewBox="0 0 28 28" fill="none" stroke="var(--teal-text)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="14" cy="14" r="11" />
+              <path d="M14 9v6" />
+              <circle cx="14" cy="19" r="0.6" fill="var(--teal-text)" stroke="none" />
+            </svg>
+            <div>
+              <h4>Why early checks matter</h4>
+              <p>
+                Melanoma is far less common than other skin cancers, but it
+                causes most skin cancer deaths. Caught early, about 99% of
+                cases are treated successfully. Catching it early is exactly
+                what a quick phone photo can help with.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* ---------------- How it works ---------------- */}
-      <section className="section section-alt">
+      <section className="section">
         <div className="container">
-          <span className="eyebrow">How It Works</span>
           <h2 className="section-heading">Three simple steps</h2>
           <p className="section-subtext">
-            From photo to result, RareFlect keeps the process quick and transparent.
+            From photo to result, Rareflect keeps the process quick and
+            transparent.
           </p>
 
           <div className="steps">
@@ -100,23 +143,22 @@ export default function Home() {
       </section>
 
       {/* ---------------- Benefits ---------------- */}
-      <section className="section">
+      <section className="section section-alt">
         <div className="container">
-          <span className="eyebrow">Why RareFlect</span>
-          <h2 className="section-heading">Purpose &amp; benefits</h2>
+          <h2 className="section-heading">Purpose and benefits</h2>
           <p className="section-subtext">
-            Built as an AI research project to explore how deep learning can support early
-            skin lesion screening.
+            Built as an AI research project to explore how deep learning can
+            support early skin lesion screening.
           </p>
 
           <div className="benefits">
             {BENEFITS.map((b) => (
               <div className="benefits__item" key={b.title}>
                 <div className="benefits__icon" aria-hidden="true">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path
                       d="M5 12.5l4.5 4.5L19 7"
-                      stroke="#14b8a6"
+                      stroke="var(--teal-text)"
                       strokeWidth="2.4"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -132,17 +174,14 @@ export default function Home() {
       </section>
 
       {/* ---------------- Disclaimer ---------------- */}
-      <section className="section section-alt">
+      <section className="section">
         <div className="container">
           <div className="disclaimer-box">
-            <span className="disclaimer-box__icon" aria-hidden="true">
-              ⚠️
-            </span>
             <p>
-              <strong>Medical disclaimer:</strong> RareFlect is a research and educational
-              prototype. Its AI-generated results are intended to support analysis and
-              awareness — they are <strong>not</strong> a medical diagnosis and should never
-              replace consultation with a qualified dermatologist.
+              <strong>Medical disclaimer.</strong> Rareflect is a research
+              and educational prototype. Its results are a screening aid, not
+              a medical diagnosis, and should never replace evaluation by a
+              qualified dermatologist.
             </p>
           </div>
         </div>
@@ -152,9 +191,11 @@ export default function Home() {
       <section className="section cta">
         <div className="container cta__inner">
           <h2 className="cta__title">Ready to try it?</h2>
-          <p className="cta__text">Upload a skin lesion image and get an instant AI-assisted read.</p>
-          <Button as={Link} to="/analyze" variant="secondary" size="md">
-            Start Analysis
+          <p className="cta__text">
+            Upload a skin lesion photo and get a screening result right away.
+          </p>
+          <Button as={Link} to="/analyze" variant="primary" size="md">
+            Analyze a photo
           </Button>
         </div>
       </section>

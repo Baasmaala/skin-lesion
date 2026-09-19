@@ -1,39 +1,98 @@
 /* ==========================================================================
    Design tokens — single source of truth for color, spacing, and type.
-   Change a value here and it propagates across every component.
+   Palette: white/near-black neutrals, teal for trust and secondary actions,
+   coral reserved for the "flagged as rare" signal, sage for reassuring
+   results. Same values used across the whole product (site + logo).
    ========================================================================== */
 :root {
-  /* Brand palette — medical blue + teal accent, per project design spec */
-  --color-primary: #1b4b91;
-  --color-primary-dark: #123663;
-  --color-primary-light: #2f6bc2;
-  --color-secondary: #eaf2fb;
-  --color-accent: #14b8a6;
-  --color-accent-dark: #0f9c8c;
+  --paper: #ffffff;
+  --surface: #ffffff;
+  --surface-soft: #f4f6f8;
+  --border: #e1e5ea;
 
-  --color-bg: #ffffff;
-  --color-bg-alt: #f6f8fb;
-  --color-border: #e2e8f0;
+  --ink: #191c20;
+  --ink-soft: #565c66;
+  --ink-muted: #8a909a;
 
-  --color-text: #172554;
-  --color-text-muted: #5b6b85;
-  --color-text-on-primary: #ffffff;
+  --coral: #e2593b;
+  --coral-soft: #fbe4de;
+  --coral-text: #b23d22;
 
-  --color-success: #15803d;
-  --color-success-bg: #ecfdf3;
-  --color-danger: #b91c1c;
-  --color-danger-bg: #fef2f2;
+  --teal: #2e6b6e;
+  --teal-soft: #e1eeee;
+  --teal-text: #1f4b4d;
 
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 22px;
+  --sage: #3f7a52;
+  --sage-soft: #e3efe6;
+  --sage-text: #2e5c3b;
 
-  --shadow-sm: 0 1px 2px rgba(23, 37, 84, 0.06), 0 1px 3px rgba(23, 37, 84, 0.08);
-  --shadow-md: 0 8px 24px rgba(23, 37, 84, 0.10);
-  --shadow-lg: 0 20px 48px rgba(23, 37, 84, 0.14);
+  /* Fixed brand mark colors — the logo tile never inverts with the theme. */
+  --brand-ink: #191c20;
+  --brand-paper: #ffffff;
+  --brand-coral: #e2593b;
+  --brand-teal: #2e6b6e;
 
-  --container-width: 1180px;
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --shadow-sm: 0 1px 2px rgba(15, 17, 20, 0.05);
+  --shadow-md: 0 8px 24px rgba(15, 17, 20, 0.08);
+
+  --container-width: 1120px;
+
+  --font-body: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Sora", "Public Sans", sans-serif;
+  --font-logo: "Fraunces", Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #12151a;
+    --surface: #191d23;
+    --surface-soft: #20252c;
+    --border: #2c333b;
+
+    --ink: #f1f3f5;
+    --ink-soft: #b7bec7;
+    --ink-muted: #7c8590;
+
+    --coral: #f0765c;
+    --coral-soft: #3d2620;
+    --coral-text: #f0937e;
+
+    --teal: #6fb0b3;
+    --teal-soft: #1c3436;
+    --teal-text: #9ad0d2;
+
+    --sage: #7cb88b;
+    --sage-soft: #1e3324;
+    --sage-text: #9fd6ac;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #12151a;
+  --surface: #191d23;
+  --surface-soft: #20252c;
+  --border: #2c333b;
+
+  --ink: #f1f3f5;
+  --ink-soft: #b7bec7;
+  --ink-muted: #7c8590;
+
+  --coral: #f0765c;
+  --coral-soft: #3d2620;
+  --coral-text: #f0937e;
+
+  --teal: #6fb0b3;
+  --teal-soft: #1c3436;
+  --teal-text: #9ad0d2;
+
+  --sage: #7cb88b;
+  --sage-soft: #1e3324;
+  --sage-text: #9fd6ac;
 }
 
 * {
@@ -47,11 +106,12 @@ body {
 }
 
 body {
-  font-family: var(--font-sans);
-  color: var(--color-text);
-  background: var(--color-bg);
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--paper);
   -webkit-font-smoothing: antialiased;
   line-height: 1.55;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 #root {
@@ -65,9 +125,11 @@ h2,
 h3,
 h4 {
   margin: 0;
+  font-family: var(--font-display);
   font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--color-primary-dark);
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  text-wrap: balance;
 }
 
 p {
@@ -100,30 +162,17 @@ button {
 }
 
 .section-alt {
-  background: var(--color-bg-alt);
-}
-
-.eyebrow {
-  display: inline-block;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-accent-dark);
-  background: rgba(20, 184, 166, 0.1);
-  padding: 6px 14px;
-  border-radius: 999px;
-  margin-bottom: 16px;
+  background: var(--surface-soft);
 }
 
 .section-heading {
-  font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+  font-size: clamp(1.5rem, 2.2vw, 2rem);
   margin-bottom: 12px;
 }
 
 .section-subtext {
-  color: var(--color-text-muted);
-  font-size: 1.05rem;
+  color: var(--ink-soft);
+  font-size: 1.02rem;
   max-width: 620px;
 }
 

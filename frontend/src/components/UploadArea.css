@@ -1,7 +1,7 @@
 .upload {
-  border: 2px dashed var(--color-border);
+  border: 2px dashed var(--border);
   border-radius: var(--radius-lg);
-  background: var(--color-bg-alt);
+  background: var(--surface-soft);
   padding: 48px 24px;
   display: flex;
   flex-direction: column;
@@ -13,15 +13,15 @@
 
 .upload:hover,
 .upload--active {
-  border-color: var(--color-accent);
-  background: var(--color-secondary);
+  border-color: var(--teal);
+  background: var(--teal-soft);
 }
 
 .upload__icon {
   width: 76px;
   height: 76px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -32,40 +32,53 @@
 .upload__title {
   font-weight: 600;
   font-size: 1.05rem;
-  color: var(--color-primary-dark);
+  color: var(--ink);
 }
 
 .upload__subtitle {
-  color: var(--color-text-muted);
+  color: var(--ink-muted);
   font-size: 0.85rem;
   margin: 10px 0;
 }
 
+.upload__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .upload__browse-btn {
-  background: var(--color-primary);
+  background: var(--teal);
   color: #fff;
-  border: none;
-  padding: 10px 22px;
+  border: 1px solid transparent;
+  padding: 10px 20px;
   border-radius: var(--radius-sm);
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: opacity 0.15s ease;
 }
 
 .upload__browse-btn:hover {
-  background: var(--color-primary-light);
+  opacity: 0.9;
+}
+
+.upload__browse-btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--border);
 }
 
 .upload__hint {
   margin-top: 16px;
   font-size: 0.78rem;
-  color: var(--color-text-muted);
+  color: var(--ink-muted);
 }
 
 .upload__error {
   margin-top: 12px;
-  color: var(--color-danger);
+  color: var(--coral-text);
   font-size: 0.85rem;
   font-weight: 500;
 }
@@ -82,7 +95,7 @@
   max-height: 380px;
   object-fit: contain;
   border-radius: var(--radius-md);
-  background: #0b1120;
+  background: var(--brand-ink);
 }
 
 .upload__preview-meta {
@@ -96,7 +109,7 @@
 
 .upload__filename {
   font-size: 0.85rem;
-  color: var(--color-text-muted);
+  color: var(--ink-muted);
   max-width: 60%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -106,7 +119,7 @@
 .upload__clear {
   background: none;
   border: none;
-  color: var(--color-primary);
+  color: var(--teal-text);
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;

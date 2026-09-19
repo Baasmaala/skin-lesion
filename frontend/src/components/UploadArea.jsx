@@ -11,9 +11,13 @@ const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
  *   previewUrl: string | null   — object URL for the preview image
  *   onFileSelected: (file) => void
  *   onClear: () => void
+ *   allowCamera: bool — hide the "Take a photo" option when the source
+ *     image must come from dedicated hardware (a clinic's dermatoscope)
+ *     rather than the device's own camera. Defaults to true (the phone path).
  */
-export default function UploadArea({ file, previewUrl, onFileSelected, onClear }) {
+export default function UploadArea({ file, previewUrl, onFileSelected, onClear, allowCamera = true }) {
   const inputRef = useRef(null);
+  const cameraInputRef = useRef(null);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState("");
 
@@ -79,19 +83,29 @@ export default function UploadArea({ file, previewUrl, onFileSelected, onClear }
         onChange={handleBrowse}
         hidden
       />
+      {allowCamera && (
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept={ACCEPTED_TYPES.join(",")}
+          capture="environment"
+          onChange={handleBrowse}
+          hidden
+        />
+      )}
 
       <div className="upload__icon" aria-hidden="true">
         <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
           <path
             d="M12 16V4M12 4L7 9M12 4l5 5"
-            stroke="#1b4b91"
+            stroke="var(--ink)"
             strokeWidth="1.8"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
           <path
             d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
-            stroke="#14b8a6"
+            stroke="var(--teal)"
             strokeWidth="1.8"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -102,16 +116,30 @@ export default function UploadArea({ file, previewUrl, onFileSelected, onClear }
       <p className="upload__title">Drag & drop your image here</p>
       <p className="upload__subtitle">or</p>
 
-      <button
-        type="button"
-        className="upload__browse-btn"
-        onClick={(e) => {
-          e.stopPropagation();
-          inputRef.current?.click();
-        }}
-      >
-        Browse Files
-      </button>
+      <div className="upload__actions">
+        {allowCamera && (
+          <button
+            type="button"
+            className="upload__browse-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              cameraInputRef.current?.click();
+            }}
+          >
+            Take a photo
+          </button>
+        )}
+        <button
+          type="button"
+          className={`upload__browse-btn ${allowCamera ? "upload__browse-btn--ghost" : ""}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            inputRef.current?.click();
+          }}
+        >
+          Browse files
+        </button>
+      </div>
 
       <p className="upload__hint">Supports JPG, PNG, WEBP</p>
 

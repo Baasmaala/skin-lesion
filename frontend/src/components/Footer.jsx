@@ -6,25 +6,33 @@ export default function Footer() {
     <footer className="footer">
       <div className="container footer__inner">
         <div className="footer__brand">
-          <span className="footer__name">RareFlect</span>
+          <span className="footer__name-wrap">
+            <span className="footer__name">
+              Rarefle<span className="footer__name-mirror">c</span>t
+            </span>
+            <span className="footer__name footer__name--reflection" aria-hidden="true">
+              Rarefle<span className="footer__name-mirror">c</span>t
+            </span>
+          </span>
           <p className="footer__tagline">
-            AI-assisted skin lesion analysis — a research prototype built as part of an
-            academic AI/Deep Learning graduation project.
+            AI assisted skin lesion screening, built as an academic deep
+            learning research project.
           </p>
         </div>
 
         <nav className="footer__links">
           <Link to="/">Home</Link>
-          <Link to="/analyze">Analyze Image</Link>
+          <Link to="/analyze">Analyze a photo</Link>
+          <Link to="/clinics">Clinics</Link>
+          <Link to="/learn">Learn</Link>
         </nav>
 
         <p className="footer__disclaimer">
-          RareFlect is a research and educational tool. Its predictions are intended to
-          support — not replace — evaluation by a qualified medical professional. Always
-          consult a dermatologist for diagnosis and treatment decisions.
+          Rareflect is a research and educational tool. Its predictions are
+          intended to support, not replace, evaluation by a qualified medical
+          professional. Always consult a dermatologist for diagnosis and
+          treatment decisions.
         </p>
-
-        <p className="footer__copy">© {new Date().getFullYear()} RareFlect. Academic project.</p>
       </div>
     </footer>
   );

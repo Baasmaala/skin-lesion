@@ -52,6 +52,32 @@ def build_resnet50_classifier(num_classes: int = 7, freeze_backbone: bool = True
     return model
 
 
+def build_efficientnet_classifier(num_classes: int = 7, freeze_backbone: bool = True) -> nn.Module:
+    """
+    Build an EfficientNet-B3 pretrained on ImageNet with a new classification
+    head — used as an architecturally different ensemble member alongside the
+    ResNet50 fold models. Different architectures tend to make different
+    mistakes than same-architecture models trained on different data slices,
+    so this targets the class confusion (e.g. MEL/NV, AKIEC/BKL) a same-arch
+    ensemble alone can't fix.
+
+    Same parameters/notes as build_resnet50_classifier — raw logits out, use
+    nn.CrossEntropyLoss.
+    """
+    weights = models.EfficientNet_B3_Weights.IMAGENET1K_V1
+    model = models.efficientnet_b3(weights=weights)
+
+    if freeze_backbone:
+        for param in model.parameters():
+            param.requires_grad = False
+
+    # model.classifier is Sequential(Dropout, Linear(in_features, 1000)) — replace the Linear.
+    in_features = model.classifier[1].in_features
+    model.classifier[1] = nn.Linear(in_features, num_classes)
+
+    return model
+
+
 def count_trainable_params(model: nn.Module) -> int:
     """Return the number of trainable parameters (i.e. requires_grad=True)."""
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
