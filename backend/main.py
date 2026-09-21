@@ -10,6 +10,7 @@ Then test at http://<server-ip>:8000/docs (interactive Swagger UI).
 """
 
 import io
+import os
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,10 +27,13 @@ app = FastAPI(
 )
 
 # Allow the frontend (dev server or deployed site) to call this API from the
-# browser. Tighten allow_origins to the real frontend URL(s) before going live.
+# browser. Set ALLOWED_ORIGINS to a comma-separated list of real frontend
+# URL(s) in production (e.g. https://your-app.vercel.app); defaults to "*"
+# for local development only.
+_allowed_origins = os.environ.get("ALLOWED_ORIGINS", "*")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"] if _allowed_origins == "*" else [o.strip() for o in _allowed_origins.split(",")],
     allow_methods=["*"],
     allow_headers=["*"],
 )
