@@ -4,6 +4,7 @@ import ResultCard from "./ResultCard.jsx";
 import Button from "./Button.jsx";
 import AnalyzeStepper from "./AnalyzeStepper.jsx";
 import { predictImage } from "../api/predictApi.js";
+import { useLanguage } from "../i18n/LanguageContext.jsx";
 import "./AnalyzePanel.css";
 
 /**
@@ -22,21 +23,16 @@ import "./AnalyzePanel.css";
  * so only one thing is on screen at a time: upload, then analyzing, then
  * the result. See AnalyzeStepper for the step-click rules.
  */
-const DEFAULT_TIPS_TITLE = "How to get the best photo";
-const DEFAULT_TIPS = [
-  "Use bright, even light. Avoid harsh shadows or glare.",
-  "Hold the camera directly above the lesion, not at an angle.",
-  "Get close enough that the lesion fills most of the frame.",
-  "Hold steady and let the camera focus before you shoot.",
-];
-
 export default function AnalyzePanel({
   showTips = true,
-  tipsTitle = DEFAULT_TIPS_TITLE,
-  tips = DEFAULT_TIPS,
+  tipsTitle,
+  tips,
   predictFn = predictImage,
   allowCamera = true,
 }) {
+  const { t } = useLanguage();
+  const resolvedTipsTitle = tipsTitle ?? t("analyzePanel.defaultTipsTitle");
+  const resolvedTips = tips ?? t("analyzePanel.defaultTips");
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [status, setStatus] = useState("idle"); // idle | loading | done | error
@@ -83,7 +79,7 @@ export default function AnalyzePanel({
       setResult(response);
       setStatus("done");
     } catch (err) {
-      setErrorMsg("Something went wrong while analyzing the image. Please try again.");
+      setErrorMsg(t("analyzePanel.errorMsg"));
       setStatus("error");
     }
   };
@@ -137,9 +133,9 @@ export default function AnalyzePanel({
 
             {showTips && !file && (
               <div className="analyze-panel__tips">
-                <h2>{tipsTitle}</h2>
+                <h2>{resolvedTipsTitle}</h2>
                 <ul>
-                  {tips.map((tip) => (
+                  {resolvedTips.map((tip) => (
                     <li key={tip}>{tip}</li>
                   ))}
                 </ul>
@@ -153,7 +149,7 @@ export default function AnalyzePanel({
                 className="analyze-panel__btn"
                 onClick={handleAnalyze}
               >
-                Analyze Image
+                {t("analyzePanel.analyzeButton")}
               </Button>
             )}
 
@@ -164,7 +160,7 @@ export default function AnalyzePanel({
         {currentStep === 2 && (
           <div className="analyze-panel__placeholder">
             <span className="analyze-panel__spinner" aria-hidden="true" />
-            <p>Analyzing image with the AI model…</p>
+            <p>{t("analyzePanel.analyzingText")}</p>
           </div>
         )}
 

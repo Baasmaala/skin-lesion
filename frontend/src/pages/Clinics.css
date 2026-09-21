@@ -20,7 +20,7 @@
   background: var(--teal-soft);
   border-radius: var(--radius-md);
   padding: 22px 24px;
-  text-align: left;
+  text-align: start;
 }
 
 .clinics__notice h2 {

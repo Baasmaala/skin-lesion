@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from "react";
+import { useLanguage } from "../i18n/LanguageContext.jsx";
 import "./UploadArea.css";
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -16,6 +17,7 @@ const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
  *     rather than the device's own camera. Defaults to true (the phone path).
  */
 export default function UploadArea({ file, previewUrl, onFileSelected, onClear, allowCamera = true }) {
+  const { t } = useLanguage();
   const inputRef = useRef(null);
   const cameraInputRef = useRef(null);
   const [dragActive, setDragActive] = useState(false);
@@ -25,13 +27,13 @@ export default function UploadArea({ file, previewUrl, onFileSelected, onClear, 
     (candidate) => {
       if (!candidate) return;
       if (!ACCEPTED_TYPES.includes(candidate.type)) {
-        setError("Please upload a JPG, PNG, or WEBP image.");
+        setError(t("uploadArea.invalidType"));
         return;
       }
       setError("");
       onFileSelected(candidate);
     },
-    [onFileSelected]
+    [onFileSelected, t]
   );
 
   const handleDrop = (e) => {
@@ -49,13 +51,13 @@ export default function UploadArea({ file, previewUrl, onFileSelected, onClear, 
   if (file && previewUrl) {
     return (
       <div className="upload upload--preview">
-        <img src={previewUrl} alt="Selected skin lesion" className="upload__preview-img" />
+        <img src={previewUrl} alt={t("uploadArea.previewAlt")} className="upload__preview-img" />
         <div className="upload__preview-meta">
           <span className="upload__filename" title={file.name}>
             {file.name}
           </span>
           <button type="button" className="upload__clear" onClick={onClear}>
-            Remove & choose another image
+            {t("uploadArea.removeButton")}
           </button>
         </div>
       </div>
@@ -113,8 +115,8 @@ export default function UploadArea({ file, previewUrl, onFileSelected, onClear, 
         </svg>
       </div>
 
-      <p className="upload__title">Drag & drop your image here</p>
-      <p className="upload__subtitle">or</p>
+      <p className="upload__title">{t("uploadArea.dragTitle")}</p>
+      <p className="upload__subtitle">{t("uploadArea.or")}</p>
 
       <div className="upload__actions">
         {allowCamera && (
@@ -126,7 +128,7 @@ export default function UploadArea({ file, previewUrl, onFileSelected, onClear, 
               cameraInputRef.current?.click();
             }}
           >
-            Take a photo
+            {t("uploadArea.takePhoto")}
           </button>
         )}
         <button
@@ -137,11 +139,11 @@ export default function UploadArea({ file, previewUrl, onFileSelected, onClear, 
             inputRef.current?.click();
           }}
         >
-          Browse files
+          {t("uploadArea.browseFiles")}
         </button>
       </div>
 
-      <p className="upload__hint">Supports JPG, PNG, WEBP</p>
+      <p className="upload__hint">{t("uploadArea.hint")}</p>
 
       {error && <p className="upload__error">{error}</p>}
     </div>

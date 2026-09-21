@@ -176,7 +176,7 @@
   font-weight: 500;
   color: var(--ink);
   min-width: 52px;
-  text-align: right;
+  text-align: end;
   font-variant-numeric: tabular-nums;
 }
 
@@ -227,7 +227,7 @@
   font-size: 0.78rem;
   color: var(--ink-muted);
   min-width: 42px;
-  text-align: right;
+  text-align: end;
   font-variant-numeric: tabular-nums;
 }
 

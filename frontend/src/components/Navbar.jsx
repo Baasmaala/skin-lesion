@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useLanguage } from "../i18n/LanguageContext.jsx";
 import "./Navbar.css";
 
 const THEME_KEY = "rareflect-theme";
@@ -15,6 +16,7 @@ function getInitialTheme() {
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState(getInitialTheme);
+  const { lang, setLang, t } = useLanguage();
 
   useEffect(() => {
     if (theme === "system") {
@@ -28,6 +30,12 @@ export default function Navbar() {
       // localStorage unavailable, theme just won't persist across visits
     }
   }, [theme]);
+
+  const themeLabels = {
+    light: t("nav.themeLight"),
+    dark: t("nav.themeDark"),
+    system: t("nav.themeSystem"),
+  };
 
   return (
     <header className="navbar">
@@ -45,7 +53,7 @@ export default function Navbar() {
 
         <button
           className="navbar__toggle"
-          aria-label="Toggle navigation menu"
+          aria-label={t("nav.toggleMenu")}
           onClick={() => setOpen((v) => !v)}
         >
           <span />
@@ -55,19 +63,19 @@ export default function Navbar() {
 
         <nav className={`navbar__links ${open ? "navbar__links--open" : ""}`}>
           <NavLink to="/" end className="navbar__link" onClick={() => setOpen(false)}>
-            Home
+            {t("nav.home")}
           </NavLink>
           <NavLink to="/analyze" className="navbar__link" onClick={() => setOpen(false)}>
-            Analyze
+            {t("nav.analyze")}
           </NavLink>
           <NavLink to="/clinics" className="navbar__link" onClick={() => setOpen(false)}>
-            Clinics
+            {t("nav.clinics")}
           </NavLink>
           <NavLink to="/learn" className="navbar__link" onClick={() => setOpen(false)}>
-            Learn
+            {t("nav.learn")}
           </NavLink>
 
-          <div className="navbar__theme" role="group" aria-label="Theme">
+          <div className="navbar__theme" role="group" aria-label={t("nav.themeGroup")}>
             {["light", "dark", "system"].map((mode) => (
               <button
                 key={mode}
@@ -75,13 +83,26 @@ export default function Navbar() {
                 className={`navbar__theme-btn ${theme === mode ? "navbar__theme-btn--active" : ""}`}
                 onClick={() => setTheme(mode)}
               >
-                {mode}
+                {themeLabels[mode]}
+              </button>
+            ))}
+          </div>
+
+          <div className="navbar__theme" role="group" aria-label={t("nav.languageGroup")}>
+            {["en", "ar"].map((code) => (
+              <button
+                key={code}
+                type="button"
+                className={`navbar__theme-btn ${lang === code ? "navbar__theme-btn--active" : ""}`}
+                onClick={() => setLang(code)}
+              >
+                {code === "en" ? "EN" : "عربي"}
               </button>
             ))}
           </div>
 
           <NavLink to="/analyze" className="navbar__cta" onClick={() => setOpen(false)}>
-            Analyze a photo
+            {t("nav.cta")}
           </NavLink>
         </nav>
       </div>

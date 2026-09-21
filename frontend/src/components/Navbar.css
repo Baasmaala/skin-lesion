@@ -17,6 +17,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  /* Brand wordmark and mirrored-R logo mark are a fixed visual design,
+     never mirrored again by RTL layout. */
+  direction: ltr;
 }
 
 .navbar__logo {

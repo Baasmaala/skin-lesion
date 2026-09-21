@@ -1,53 +1,20 @@
 import { Link } from "react-router-dom";
 import Button from "../components/Button.jsx";
+import { useLanguage } from "../i18n/LanguageContext.jsx";
 import "./Home.css";
 
-const STEPS = [
-  {
-    number: "01",
-    title: "Take or upload a photo",
-    text: "Take a clear photo of a lesion yourself, or have one captured at a partner clinic.",
-  },
-  {
-    number: "02",
-    title: "The model analyzes it",
-    text: "A model trained on dermatologist graded images evaluates the lesion's features.",
-  },
-  {
-    number: "03",
-    title: "Get a clear result",
-    text: "See whether it looks common, uncertain, or flagged as rare, plus a clear next step.",
-  },
-];
-
-const BENEFITS = [
-  {
-    title: "Fast, private screening",
-    text: "Get a read on a lesion in under a minute, with no appointment needed to start.",
-  },
-  {
-    title: "Built on real research",
-    text: "Trained on dermatologist graded dermoscopy images, evaluated with attention to rare classes.",
-  },
-  {
-    title: "A clear next step, always",
-    text: "Every result names what to do next, whether that is nothing, a follow up, or a dermatologist visit.",
-  },
-];
-
 export default function Home() {
+  const { t } = useLanguage();
+  const steps = t("home.steps.items");
+  const benefits = t("home.benefits.items");
+
   return (
     <>
       {/* ---------------- Hero ---------------- */}
       <section className="hero">
         <div className="container">
-          <h1 className="hero__title">Check a lesion your way.</h1>
-          <p className="hero__subtitle">
-            Rareflect screens skin lesions with a model trained on images
-            graded by dermatologists. Start from your phone in seconds, or
-            visit a partner clinic for a more detailed scan and a direct path
-            to a dermatologist if something needs a closer look.
-          </p>
+          <h1 className="hero__title">{t("home.hero.title")}</h1>
+          <p className="hero__subtitle">{t("home.hero.subtitle")}</p>
         </div>
       </section>
 
@@ -61,14 +28,10 @@ export default function Home() {
                 <circle cx="20" cy="30" r="1.6" fill="var(--teal-text)" stroke="none" />
                 <path d="M15 9h10" strokeWidth="1.6" />
               </svg>
-              <h3>Use your phone</h3>
-              <p>
-                Take a photo at home and get a screening result in under a
-                minute. It is private, free to start, and needs no
-                appointment.
-              </p>
+              <h3>{t("home.phonePath.title")}</h3>
+              <p>{t("home.phonePath.text")}</p>
               <Button as={Link} to="/analyze" variant="primary" size="md" className="path-card__cta">
-                Analyze a photo
+                {t("home.phonePath.cta")}
               </Button>
             </div>
 
@@ -79,23 +42,15 @@ export default function Home() {
                 <path d="M20 14v-6M17 11h6" strokeWidth="2" />
                 <path d="M6 22h28" strokeWidth="1.4" opacity="0.5" />
               </svg>
-              <h3>Visit a clinic</h3>
-              <p>
-                Partner clinics capture a dermatoscope scan, read by a model
-                trained specifically on that kind of image, then connect you
-                straight to a dermatologist if a result is flagged.
-              </p>
+              <h3>{t("home.clinicPath.title")}</h3>
+              <p>{t("home.clinicPath.text")}</p>
               <Button as={Link} to="/clinics" variant="outline" size="md" className="path-card__cta">
-                Find a clinic
+                {t("home.clinicPath.cta")}
               </Button>
             </div>
           </div>
 
-          <p className="paths__fine-print">
-            Rareflect is a screening aid, not a diagnosis. Results flagged as
-            rare should always be reviewed by a dermatologist. The clinic
-            path connects you to one directly.
-          </p>
+          <p className="paths__fine-print">{t("home.finePrint")}</p>
         </div>
       </section>
 
@@ -109,13 +64,8 @@ export default function Home() {
               <circle cx="14" cy="19" r="0.6" fill="var(--teal-text)" stroke="none" />
             </svg>
             <div>
-              <h4>Why early checks matter</h4>
-              <p>
-                Melanoma is far less common than other skin cancers, but it
-                causes most skin cancer deaths. Caught early, about 99% of
-                cases are treated successfully. Catching it early is exactly
-                what a quick phone photo can help with.
-              </p>
+              <h4>{t("home.funFact.title")}</h4>
+              <p>{t("home.funFact.text")}</p>
             </div>
           </div>
         </div>
@@ -124,14 +74,11 @@ export default function Home() {
       {/* ---------------- How it works ---------------- */}
       <section className="section">
         <div className="container">
-          <h2 className="section-heading">Three simple steps</h2>
-          <p className="section-subtext">
-            From photo to result, Rareflect keeps the process quick and
-            transparent.
-          </p>
+          <h2 className="section-heading">{t("home.steps.heading")}</h2>
+          <p className="section-subtext">{t("home.steps.subtext")}</p>
 
           <div className="steps">
-            {STEPS.map((step) => (
+            {steps.map((step) => (
               <div className="steps__item" key={step.number}>
                 <span className="steps__number">{step.number}</span>
                 <h3 className="steps__title">{step.title}</h3>
@@ -145,14 +92,11 @@ export default function Home() {
       {/* ---------------- Benefits ---------------- */}
       <section className="section section-alt">
         <div className="container">
-          <h2 className="section-heading">Purpose and benefits</h2>
-          <p className="section-subtext">
-            Built as an AI research project to explore how deep learning can
-            support early skin lesion screening.
-          </p>
+          <h2 className="section-heading">{t("home.benefits.heading")}</h2>
+          <p className="section-subtext">{t("home.benefits.subtext")}</p>
 
           <div className="benefits">
-            {BENEFITS.map((b) => (
+            {benefits.map((b) => (
               <div className="benefits__item" key={b.title}>
                 <div className="benefits__icon" aria-hidden="true">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -178,10 +122,7 @@ export default function Home() {
         <div className="container">
           <div className="disclaimer-box">
             <p>
-              <strong>Medical disclaimer.</strong> Rareflect is a research
-              and educational prototype. Its results are a screening aid, not
-              a medical diagnosis, and should never replace evaluation by a
-              qualified dermatologist.
+              <strong>{t("home.disclaimer.label")}</strong> {t("home.disclaimer.text")}
             </p>
           </div>
         </div>
@@ -190,12 +131,10 @@ export default function Home() {
       {/* ---------------- Closing CTA ---------------- */}
       <section className="section cta">
         <div className="container cta__inner">
-          <h2 className="cta__title">Ready to try it?</h2>
-          <p className="cta__text">
-            Upload a skin lesion photo and get a screening result right away.
-          </p>
+          <h2 className="cta__title">{t("home.cta.title")}</h2>
+          <p className="cta__text">{t("home.cta.text")}</p>
           <Button as={Link} to="/analyze" variant="primary" size="md">
-            Analyze a photo
+            {t("home.cta.button")}
           </Button>
         </div>
       </section>

@@ -1,11 +1,6 @@
 import { Fragment } from "react";
+import { useLanguage } from "../i18n/LanguageContext.jsx";
 import "./AnalyzeStepper.css";
-
-const STEPS = [
-  { id: 1, label: "Upload" },
-  { id: 2, label: "Analyzing" },
-  { id: 3, label: "Result" },
-];
 
 /**
  * Horizontal 1-2-3 timeline for the upload -> analyze -> result flow.
@@ -20,6 +15,13 @@ const STEPS = [
  *  - Step 3 is only clickable once a result exists.
  */
 export default function AnalyzeStepper({ currentStep, canGoToStep2, canGoToStep3, onStepClick }) {
+  const { t } = useLanguage();
+  const STEPS = [
+    { id: 1, label: t("stepper.upload") },
+    { id: 2, label: t("stepper.analyzing") },
+    { id: 3, label: t("stepper.result") },
+  ];
+
   const isEnabled = (id) => {
     if (id === 1) return true;
     if (id === 2) return canGoToStep2;

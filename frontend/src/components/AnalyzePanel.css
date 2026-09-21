@@ -31,7 +31,7 @@
 
 .analyze-panel__tips ul {
   margin: 0;
-  padding-left: 18px;
+  padding-inline-start: 18px;
   display: flex;
   flex-direction: column;
   gap: 6px;

@@ -1,62 +1,38 @@
 import { useEffect, useRef, useState } from "react";
+import { useLanguage } from "../i18n/LanguageContext.jsx";
 import "./Learn.css";
 
-const LESION_TYPES = [
-  {
-    code: "MEL",
-    name: "Melanoma",
-    malignant: true,
-    text: "The most serious form of skin cancer. It develops in the pigment producing cells and can spread to other parts of the body if not caught early. Often shows up as a new mole, or an existing one that changes in size, shape, or color. Early detection makes a real difference in outcomes.",
-    image: "/lesion-examples/MEL.jpg",
-  },
-  {
-    code: "NV",
-    name: "Melanocytic Nevus",
-    malignant: false,
-    text: "Commonly known as a mole. Almost everyone has several, and the vast majority stay harmless for life. Still worth keeping an eye on if one changes noticeably over time.",
-    image: "/lesion-examples/NV.jpg",
-  },
-  {
-    code: "BCC",
-    name: "Basal Cell Carcinoma",
-    malignant: true,
-    text: "The most common form of skin cancer. It grows slowly and rarely spreads beyond the skin, but can damage surrounding tissue if left untreated. Often looks like a pearly or waxy bump, or a flat patch that will not heal.",
-    image: "/lesion-examples/BCC.jpg",
-  },
-  {
-    code: "AKIEC",
-    name: "Actinic Keratosis / Intraepithelial Carcinoma",
-    malignant: true,
-    text: "A rough, scaly patch caused by years of sun exposure, sometimes described as precancerous. A small number of cases progress into a more serious skin cancer if left untreated, so these are usually monitored or removed.",
-    image: "/lesion-examples/AKIEC.jpg",
-  },
-  {
-    code: "BKL",
-    name: "Benign Keratosis",
-    malignant: false,
-    text: "A group of harmless growths that become more common with age. They often look waxy, scaly, or stuck on the skin, and do not need treatment unless they become irritated.",
-    image: "/lesion-examples/BKL.jpg",
-  },
-  {
-    code: "DF",
-    name: "Dermatofibroma",
-    malignant: false,
-    text: "A small, firm, harmless nodule, often found on the legs. It is sometimes linked to a minor injury such as an insect bite, and does not require treatment.",
-    image: "/lesion-examples/DF.jpg",
-  },
-  {
-    code: "VASC",
-    name: "Vascular Lesion",
-    malignant: false,
-    text: "A group of harmless lesions made up of blood vessels, appearing as red or purple marks on the skin. Most are present from birth or develop naturally and are not a health concern.",
-    image: "/lesion-examples/VASC.jpg",
-  },
-];
+const MALIGNANT_BY_CODE = {
+  MEL: true,
+  NV: false,
+  BCC: true,
+  AKIEC: true,
+  BKL: false,
+  DF: false,
+  VASC: false,
+};
+
+const IMAGE_BY_CODE = {
+  MEL: "/lesion-examples/MEL.jpg",
+  NV: "/lesion-examples/NV.jpg",
+  BCC: "/lesion-examples/BCC.jpg",
+  AKIEC: "/lesion-examples/AKIEC.jpg",
+  BKL: "/lesion-examples/BKL.jpg",
+  DF: "/lesion-examples/DF.jpg",
+  VASC: "/lesion-examples/VASC.jpg",
+};
 
 export default function Learn() {
+  const { t } = useLanguage();
+  const lesionTypes = t("learn.types").map((item) => ({
+    ...item,
+    malignant: MALIGNANT_BY_CODE[item.code],
+    image: IMAGE_BY_CODE[item.code],
+  }));
+
   const [index, setIndex] = useState(0);
-  const total = LESION_TYPES.length;
-  const current = LESION_TYPES[index];
+  const total = lesionTypes.length;
+  const current = lesionTypes[index];
   const touchStartX = useRef(null);
 
   const goNext = () => setIndex((i) => (i + 1) % total);
@@ -87,13 +63,8 @@ export default function Learn() {
     <section className="section learn">
       <div className="container">
         <div className="learn__header">
-          <h1 className="learn__title">The seven types we screen for</h1>
-          <p className="learn__subtitle">
-            Rareflect classifies a lesion into one of seven categories,
-            three of them cancerous or precancerous and four of them
-            benign. This is general information, not medical advice. A
-            dermatologist should always confirm any diagnosis.
-          </p>
+          <h1 className="learn__title">{t("learn.title")}</h1>
+          <p className="learn__subtitle">{t("learn.subtitle")}</p>
         </div>
 
         <div className="learn__carousel">
@@ -101,7 +72,7 @@ export default function Learn() {
             type="button"
             className="learn__arrow"
             onClick={goPrev}
-            aria-label="Previous lesion type"
+            aria-label={t("learn.prevAria")}
           >
             ‹
           </button>
@@ -117,7 +88,7 @@ export default function Learn() {
                   current.malignant ? "learn__badge--flag" : "learn__badge--ok"
                 }`}
               >
-                {current.malignant ? "Cancerous or precancerous" : "Usually benign"}
+                {current.malignant ? t("learn.malignantBadge") : t("learn.benignBadge")}
               </span>
               <h2>{current.name}</h2>
               <p>{current.text}</p>
@@ -125,7 +96,7 @@ export default function Learn() {
             <img
               className="learn__card-visual"
               src={current.image}
-              alt={`Dermoscopic example of ${current.name}`}
+              alt={t("learn.imageAlt").replace("{name}", current.name)}
             />
           </div>
 
@@ -133,14 +104,14 @@ export default function Learn() {
             type="button"
             className="learn__arrow"
             onClick={goNext}
-            aria-label="Next lesion type"
+            aria-label={t("learn.nextAria")}
           >
             ›
           </button>
         </div>
 
-        <div className="learn__dots" role="tablist" aria-label="Lesion type">
-          {LESION_TYPES.map((item, i) => (
+        <div className="learn__dots" role="tablist" aria-label={t("learn.dotsAria")}>
+          {lesionTypes.map((item, i) => (
             <button
               key={item.code}
               type="button"
@@ -154,11 +125,11 @@ export default function Learn() {
         </div>
 
         <p className="learn__credit">
-          Example images from the{" "}
+          {t("learn.creditBefore")}{" "}
           <a href="https://www.isic-archive.com/" target="_blank" rel="noreferrer">
-            ISIC Archive
+            {t("learn.creditLinkText")}
           </a>
-          , released under CC0.
+          {t("learn.creditAfter")}
         </p>
       </div>
     </section>
