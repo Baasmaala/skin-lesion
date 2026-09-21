@@ -27,7 +27,7 @@ import "./ResultCard.css";
  * only, matching its use as the "rare" signal in the logo.
  */
 export default function ResultCard({ result }) {
-  const { t } = useLanguage();
+  const { t, tName } = useLanguage();
   if (!result) return null;
 
   // Below LOW_CONFIDENCE_THRESHOLD: blocked entirely, no classification or
@@ -84,7 +84,7 @@ export default function ResultCard({ result }) {
       <div className="result-card__grid">
         <div className="result-card__field">
           <span className="result-card__label">{t("resultCard.predictedTypeLabel")}</span>
-          <span className="result-card__value">{result.type}</span>
+          <span className="result-card__value">{tName(result.type)}</span>
         </div>
 
         <div className="result-card__field result-card__field--wide">
@@ -109,7 +109,7 @@ export default function ResultCard({ result }) {
           <div className="result-card__breakdown-list">
             {result.class_probabilities.map((row) => (
               <div className="result-card__breakdown-row" key={row.class_code}>
-                <span className="result-card__breakdown-name">{row.name}</span>
+                <span className="result-card__breakdown-name">{tName(row.name)}</span>
                 <div className="result-card__breakdown-bar-track">
                   <div
                     className="result-card__breakdown-bar-fill"

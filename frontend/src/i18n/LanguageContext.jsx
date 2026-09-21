@@ -37,7 +37,14 @@ export function LanguageProvider({ children }) {
       const value = readPath(translations[lang], path) ?? readPath(translations.en, path);
       return value ?? path;
     };
-    return { lang, setLang, dir, t };
+    // Backend class names (e.g. "Melanoma") are plain English strings, not
+    // translation keys, so they need a lookup by value rather than by path.
+    // Falls back to the original name for anything not in the table
+    // (English mode, or a blocked-result message that isn't a class name).
+    const tName = (name) => translations.ar.classNames?.[name] && lang === "ar"
+      ? translations.ar.classNames[name]
+      : name;
+    return { lang, setLang, dir, t, tName };
   }, [lang, dir]);
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;

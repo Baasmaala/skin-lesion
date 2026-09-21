@@ -443,5 +443,28 @@ export const translations = {
       browseFiles: "تصفح الملفات",
       hint: "يدعم صيغ JPG وPNG وWEBP",
     },
+    // Backend class names arrive as plain English text (result.type and
+    // class_probabilities[].name), not translation keys, since they come
+    // straight from backend/inference.py and inference_clinical.py's
+    // CLASS_INFO. This maps those exact strings to Arabic. Covers both
+    // the dermoscopic model's 7 classes (matching learn.types above) and
+    // the clinical model's 6 classes (backend/inference_clinical.py),
+    // which share some names (Melanoma, Basal Cell Carcinoma) but not
+    // others (its "Nevus" and "Actinic Keratosis" are distinct diagnoses
+    // from the dermoscopic model's "Melanocytic Nevus" and combined
+    // "Actinic Keratosis / Intraepithelial Carcinoma").
+    classNames: {
+      "Melanoma": "الورم الميلانيني",
+      "Melanocytic Nevus": "الوحمة الميلانينية",
+      "Basal Cell Carcinoma": "سرطان الخلايا القاعدية",
+      "Actinic Keratosis / Intraepithelial Carcinoma": "التقرن السفعي / السرطان داخل الظهارة",
+      "Benign Keratosis": "التقرن الحميد",
+      "Dermatofibroma": "الورم الليفي الجلدي",
+      "Vascular Lesion": "آفة وعائية",
+      "Actinic Keratosis": "التقرن السفعي",
+      "Nevus": "وحمة",
+      "Squamous Cell Carcinoma": "سرطان الخلايا الحرشفية",
+      "Seborrheic Keratosis": "التقرن الدهني",
+    },
   },
 };
