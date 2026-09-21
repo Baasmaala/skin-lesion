@@ -14,7 +14,6 @@ import io
 import matplotlib
 
 matplotlib.use("Agg")  # headless server — no display backend needed
-import matplotlib.cm as cm
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -83,7 +82,7 @@ def _denormalize(x: torch.Tensor) -> np.ndarray:
 
 def _overlay(img_rgb: np.ndarray, heat: np.ndarray, alpha: float = 0.45) -> np.ndarray:
     """Blend a heatmap onto an RGB image using the same 'jet' colormap as the notebook."""
-    cmap = cm.get_cmap("jet")
+    cmap = matplotlib.colormaps["jet"]
     heat_rgb = cmap(heat)[..., :3]
     return (1 - alpha) * img_rgb + alpha * heat_rgb
 
